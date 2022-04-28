@@ -11,9 +11,45 @@ function updateTodoList() {
       //Update the Page
       data.forEach((todos) => {
         const li = document.createElement("li");
+        const completeButton = document.createElement("button")
+        completeButton.innerText = "complete"
+        completeButton.addEventListener("click", event => {
+          const opts = {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({completed: true }),
+          };
+        
+          fetch(`http://localhost:3000/todos/${todos.id}`, opts)
+            .then((res) => res.json())
+            .then((data) => {
+              updateTodoList();
+            });
+        })
+
+        const deleteButton = document.createElement("button")
+        deleteButton.innerText = "delete"
+        deleteButton.addEventListener("click", event => {
+          const opts = {
+            method: "DELETE",
+          };
+        
+          fetch(`http://localhost:3000/todos/${todos.id}`, opts)
+            .then((res) => res.json())
+            .then((data) => {
+              updateTodoList();
+            });
+
+        })
+       
         li.innerText = todos.title;
+        li.append(deleteButton)
         if (todos.completed) {
-          li.className = "completed";
+          // li.className = "completed";
+          //two ways you can write this
+          li.setAttribute("class", "completed")
+        } else{
+          li.append(completeButton)
         }
         list.append(li);
       });
@@ -22,11 +58,11 @@ function updateTodoList() {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  
+
   //Get data from the input field
   const title = event.target[0].value;
-  
-  event.target.reset()
+
+  event.target.reset();
 
   const opts = {
     method: "POST",
